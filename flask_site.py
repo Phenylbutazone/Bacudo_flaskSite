@@ -20,6 +20,33 @@ def index():
     items = Item.query.all()
     return render_template('index.html', items=items)
 
+@app.route('/create', methods=['GET', 'POST'])
+def create():
+    if request.method == 'POST':
+        name = request.form['name']
+        new_item = Item(name=name)
+        db.session.add(new_item)
+        db.session.commit()
+        return redirect(url_for('index'))
+    return render_template('create.html')
+
+@app.route('/update/<int:idNum>', methods=['GET', 'POST'])
+def update(idNum):
+    item = Item.query.get_or_404(idNum)
+    if request.method == 'POST':
+        item.name = request.form['name']
+        db.session.commit()
+        return redirect(url_for('index'))
+    return render_template('update.html', item=item)
+
+@app.route('/delete/<int:idNum>', methods=['POST'])
+def delete(idNum):
+    item = Item.query.get_or_404(idNum)
+    db.session.delete(item)
+    db.session.commit()
+    return redirect(url_for('index'))
+
+
 
 @app.route("/hello")
 @app.route("/hello/")
